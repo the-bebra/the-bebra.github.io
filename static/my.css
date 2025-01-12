@@ -43,7 +43,8 @@ main {
     position: relative;
     background-size: cover;
     background-repeat: no-repeat;
-    overflow: hidden; 
+    overflow: hidden;
+    image-rendering: pixelated;
 }
 
 p, h1, h2, h3 {
