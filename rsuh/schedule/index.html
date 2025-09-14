@@ -68,11 +68,18 @@
       document.getElementById("empty").hidden = !empty;
     }
 
-    function td(label, text, cls = "") {
+    function td(label, text, cls=""){
       const cell = document.createElement("td");
-      cell.textContent = text;
-      if (cls) cell.className = cls;
       cell.setAttribute("data-th", label);
+      if(cls) cell.className = cls;
+      if(label === "Преподаватель" && text && text !== "—"){
+        const link = document.createElement("a");
+        link.href = "https://rsuh.ru/search/?q=" + encodeURIComponent(text);
+        link.textContent = text;
+        cell.appendChild(link);
+      } else {
+        cell.textContent = text;
+      }
       return cell;
     }
 
