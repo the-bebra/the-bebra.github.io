@@ -1,56 +1,61 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html>
 
 <head>
-  <meta charset="UTF-8" />
-  <title>Моё расписание РГГУ</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>aleksei stepanov - rsuh</title>
+  <meta name="title" content="алексей степанов - рггу">
+  <meta name="description" content="моё расписание в рггу">
   <link rel="stylesheet" href="../../static/my.css" type='text/css'>
   <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Merriweather' type='text/css'>
+
+  <link rel="icon" href="../../static/img/512.png" type="image/png" />
 </head>
 
 <body>
-  <div class="wrap">
-    <div class="card">
-      <header>
-        <div>
-          <h1>Моё расписание РГГУ</h1>
-        </div>
-        <form id="dateForm">
-          <input type="date" id="scheduleDate" required />
-          <button type="submit" id="fetchBtn">Показать</button>
-        </form>
-      </header>
+  <header>
+    <h1>Моё расписание РГГУ</h1>
+    <form id="dateForm">
+      <input type="date" id="scheduleDate" required />
+      <button type="submit" id="fetchBtn">Показать</button>
+    </form>
+  </header>
 
-      <main>
-        <div id="loading" class="loading" hidden>Загрузка…</div>
-        <div id="empty" class="empty" hidden>Занятий не найдено для выбранной даты.</div>
+  <main>
+    <div id="loading" class="loading" hidden>Загрузка…</div>
+    <div id="empty" class="empty" hidden>Занятий не найдено для выбранной даты.</div>
 
-        <div style="overflow:auto">
-          <table id="schedTable" hidden>
-            <thead>
-              <tr>
-                <th>Пара</th>
-                <th>Время</th>
-                <th>Аудитория</th>
-                <th>Дисциплина</th>
-                <th>Тип</th>
-                <th>Преподаватель</th>
-              </tr>
-            </thead>
-            <tbody id="tbody"></tbody>
-          </table>
-        </div>
-      </main>
+    <div style="overflow:auto">
+      <table id="schedTable" hidden>
+        <thead>
+          <tr>
+            <th>Пара</th>
+            <th>Время</th>
+            <th>Аудитория</th>
+            <th>Дисциплина</th>
+            <th>Тип</th>
+            <th>Преподаватель</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
     </div>
-  </div>
+  </main>
+
+  <footer>
+    <p>
+      I have no idea where this will lead us
+      <br>
+      but I have a definite feeling it will be a place both wonderful and strange
+    </p>
+    <img src="../../static/img/coffee.gif" alt="damn good coffee"
+      style="position: absolute; left: calc(50% - 6rem); width: 12rem;" />
+  </footer>
 
   <script>
     const API = "https://raspis.rggu.ru/api/Get_Schedule_Table";
-    const DEFAULT_FLOW = "569_1"; // при необходимости измените
+    const DEFAULT_FLOW = "569_1";
 
-    // Соответствие номер пары -> время
     const PAIR_TIME = {
       1: "8:45 10:05",
       2: "10:15 11:35",
@@ -68,11 +73,11 @@
       document.getElementById("empty").hidden = !empty;
     }
 
-    function td(label, text, cls=""){
+    function td(label, text, cls = "") {
       const cell = document.createElement("td");
       cell.setAttribute("data-th", label);
-      if(cls) cell.className = cls;
-      if(label === "Преподаватель" && text && text !== "—"){
+      if (cls) cell.className = cls;
+      if (label === "Преподаватель" && text && text !== "—") {
         const link = document.createElement("a");
         link.href = "https://rsuh.ru/search/?q=" + encodeURIComponent(text);
         link.textContent = text;
