@@ -1,37 +1,171 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
+
 <head>
-  <meta charset="UTF-8">
-  <title>Schedule JSON</title>
+  <meta charset="UTF-8" />
+  <title>Моё расписание РГГУ</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <link rel="stylesheet" href="../../../static/my.css" type='text/css'>
+  <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Merriweather' type='text/css'>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="card">
+      <header>
+        <div>
+          <h1>Моё расписание РГГУ</h1>
+        </div>
+        <form id="dateForm">
+          <input type="date" id="scheduleDate" required />
+          <button type="submit" id="fetchBtn">Показать</button>
+        </form>
+      </header>
+
+      <main>
+        <div id="loading" class="loading" hidden>Загрузка…</div>
+        <div id="empty" class="empty" hidden>Занятий не найдено для выбранной даты.</div>
+
+        <div style="overflow:auto">
+          <table id="schedTable" hidden>
+            <thead>
+              <tr>
+                <th>Пара</th>
+                <th>Время</th>
+                <th>Аудитория</th>
+                <th>Дисциплина</th>
+                <th>Тип</th>
+                <th>Преподаватель</th>
+              </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+      </main>
+    </div>
+  </div>
+
   <script>
-    async function loadSchedule() {
+    const API = "https://raspis.rggu.ru/api/Get_Schedule_Table";
+    const DEFAULT_FLOW = "569_1"; // при необходимости измените
+
+    // Соответствие номер пары -> время
+    const PAIR_TIME = {
+      1: "8:45 10:05",
+      2: "10:15 11:35",
+      3: "12:10 13:30",
+      4: "13:40 15:00",
+      5: "15:35 16:55",
+      6: "17:05 18:25"
+    };
+    const getPairTime = (n) => PAIR_TIME[n] || "—";
+    function clearTable() { document.getElementById("tbody").innerHTML = ""; }
+
+    function showState({ loading = false, hasData = false, empty = false }) {
+      document.getElementById("loading").hidden = !loading;
+      document.getElementById("schedTable").hidden = !hasData;
+      document.getElementById("empty").hidden = !empty;
+    }
+
+    function td(label, text, cls = "") {
+      const cell = document.createElement("td");
+      cell.textContent = text;
+      if (cls) cell.className = cls;
+      cell.setAttribute("data-th", label);
+      return cell;
+    }
+
+    function renderTable(data) {
+      const tbody = document.getElementById("tbody");
+      clearTable();
+
+      const days = Array.isArray(data.tblData) ? data.tblData : [];
+      let rowsCount = 0;
+
+      for (const day of days) {
+        const pairs = Array.isArray(day?.pairs) ? day.pairs : [];
+
+        for (const pair of pairs) {
+          const pairNum = pair?.pair ?? "";
+          const timeStr = getPairTime(Number(pairNum));
+          const flows = Array.isArray(pair?.flows) ? pair.flows : [];
+
+          if (flows.length === 0) {
+            const tr = document.createElement("tr");
+            tr.appendChild(td("Пара", String(pairNum)));
+            tr.appendChild(td("Время", timeStr));
+            tr.appendChild(td("Аудитория", "—"));
+            tr.appendChild(td("Дисциплина", "—", "subject"));
+            tr.appendChild(td("Тип", "—"));
+            tr.appendChild(td("Преподаватель", "—"));
+            tbody.appendChild(tr);
+            rowsCount++;
+            continue;
+          }
+
+          for (const f of flows) {
+            const tr = document.createElement("tr");
+            tr.appendChild(td("Пара", String(pairNum)));
+            tr.appendChild(td("Время", timeStr));
+            tr.appendChild(td("Аудитория", f?.room ?? "—"));
+            tr.appendChild(td("Дисциплина", f?.subject ?? "—", "subject"));
+            tr.appendChild(td("Тип", f?.lessontype ?? "—"));
+            tr.appendChild(td("Преподаватель", f?.teacher ?? "—"));
+            tbody.appendChild(tr);
+            rowsCount++;
+          }
+        }
+      }
+
+      showState({ loading: false, hasData: rowsCount > 0, empty: rowsCount === 0 });
+    }
+
+    async function fetchSchedule(dateStr, flow) {
       const formData = new FormData();
       formData.append("eduform", "7");
       formData.append("course", "1");
-      formData.append("intervalMode", "3");
+      formData.append("intervalMode", "5");
+      formData.append("startDate", dateStr);
+      formData.append("endDate", dateStr);
       formData.append("menuMode", "flow");
-      formData.append("flow", "569_1");
+      formData.append("flow", flow);
 
+      const res = await fetch(API, { method: "POST", body: formData });
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      return await res.json();
+    }
+
+    async function handleSubmit(e) {
+      e.preventDefault();
+      const btn = document.getElementById("fetchBtn");
+      const date = document.getElementById("scheduleDate").value;
+      if (!date) return;
+
+      btn.disabled = true;
+      showState({ loading: true, hasData: false, empty: false });
       try {
-        const response = await fetch("https://raspis.rggu.ru/api/Get_Schedule_Table", {
-          method: "POST",
-          body: formData
-        });
-
-        const json = await response.json();
-        // Replace the entire page with pretty-printed JSON
-        document.open();
-        document.write("<pre>" + JSON.stringify(json, null, 2) + "</pre>");
-        document.close();
+        const data = await fetchSchedule(date, DEFAULT_FLOW);
+        renderTable(data);
       } catch (err) {
-        document.body.textContent = "Error: " + err;
+        clearTable();
+        showState({ loading: false, hasData: false, empty: true });
+        document.getElementById("empty").textContent = "Ошибка: " + err.message;
+      } finally {
+        btn.disabled = false;
       }
     }
 
-    window.addEventListener("DOMContentLoaded", loadSchedule);
+    (function init() {
+      const input = document.getElementById("scheduleDate");
+      const today = new Date();
+      const yyyy = today.getFullYear();
+      const mm = String(today.getMonth() + 1).padStart(2, "0");
+      const dd = String(today.getDate()).padStart(2, "0");
+      input.value = `${yyyy}-${mm}-${dd}`;
+      document.getElementById("dateForm").addEventListener("submit", handleSubmit);
+    })();
   </script>
-</head>
-<body>
-  <p>Loading…</p>
 </body>
+
 </html>
