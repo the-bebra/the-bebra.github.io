@@ -92,7 +92,7 @@ a {
     color: #000000;
 }
 
-/* spotify now playing: vinyl with the cover as its label */
+/* spotify now playing: a CD with the cover printed on it */
 .np {
     display: flex;
     align-items: center;
@@ -106,22 +106,24 @@ a {
     aspect-ratio: 1;
     border-radius: 50%;
     border: 0.1rem solid #000000;
-    background: repeating-radial-gradient(#111111 0 0.15rem, #333333 0.15rem 0.3rem);
+    background: conic-gradient(#d8e0e0, #f6c6ea, #c6f0f6, #f6f2c6, #d8e0e0);
+    mask-image: radial-gradient(circle closest-side, transparent 12.5%, #000000 12.5%);
 }
 
 .np .label {
     position: absolute;
-    inset: 28%;
+    inset: 3%;
     border-radius: 50%;
-    background: #ebed8d center / cover;
+    background: center / cover;
 }
 
-.np .label::after {
+.np .disc::after {
     content: '';
     position: absolute;
-    inset: 44%;
+    inset: 33%;
     border-radius: 50%;
-    background-color: #e7ffff;
+    border: 0.1rem solid #000000;
+    background: radial-gradient(circle closest-side, #000000 41%, #d8e0e0cc 41%);
 }
 
 .np.playing .disc {
