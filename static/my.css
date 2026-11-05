@@ -91,3 +91,68 @@ a {
     background-color: #ebed8d;
     color: #000000;
 }
+
+/* spotify now playing: vinyl with the cover as its label */
+.np {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration-line: none;
+}
+
+.np .disc {
+    position: relative;
+    flex: 0 0 40%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    border: 0.1rem solid #000000;
+    background: repeating-radial-gradient(#111111 0 0.15rem, #333333 0.15rem 0.3rem);
+}
+
+.np .label {
+    position: absolute;
+    inset: 28%;
+    border-radius: 50%;
+    background: #ebed8d center / cover;
+}
+
+.np .label::after {
+    content: '';
+    position: absolute;
+    inset: 44%;
+    border-radius: 50%;
+    background-color: #e7ffff;
+}
+
+.np.playing .disc {
+    animation: spin 4s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .np.playing .disc {
+        animation: none;
+    }
+}
+
+.np .text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    padding: 0.3rem 0.5rem;
+    background-color: #ffffe6;
+    border: 0.1rem solid #000000;
+    box-shadow: 0.2rem 0.2rem 0 #000000;
+    overflow-wrap: anywhere;
+}
+
+.np .text > * {
+    font-size: clamp(0.65rem, 2vw, 0.8rem);
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+}
