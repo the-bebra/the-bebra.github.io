@@ -28,16 +28,16 @@
             <img src="../static/img/hse.gif"
             style="
             position: absolute;
-            bottom: 3vh;
-            left: 2%;
-            max-width: 12%;"
+            bottom: 10vh;
+            left: 55%;
+            max-width: 35%;"
             alt="cringy place"/>
             <a class="np" id="np" href="https://open.spotify.com/user/bcb00rqhxhsmdwikjdb4k9se1"
             style="
             position: absolute;
-            bottom: 8vh;
-            left: 54%;
-            width: 44%;">
+            bottom: 5vh;
+            left: 57%;
+            width: 33%;">
                 <span class="disc"><span class="label"></span></span>
                 <span class="text">
                     <small>♫ spotify</small>
@@ -77,14 +77,14 @@
                 <br>
                 — Definitely <a href="https://mangalib.me/ru/user/1515653">NOT</a> a weaboo
                 <br>
-                — A true fan of Rammstein and Belle Delphine
+                — A true fan of Rammstein and MAYBE BABY (those who know, know)
                 <br>
                 — My views are libertarian
             </p>
             <p>
-                — I dream of <a href="https://en.wikipedia.org/wiki/Fugging,_Upper_Austria">Fugging</a>, possibly the best thing on Earth
+                — My dream is to visit the city of <a href="https://www.google.com/search?q=Bebra+city">Bebra</a>, potentially the best place on the planet (those who know, know).
                 <br>
-                — <s>Currently based in the greatest metropolis of Russia: <a href="https://www.google.com/search?q=balashikha">Balashikha</a> (it doesn't matter if you’ve never heard of it, nobody has)</s> I've moved to Moscow :(
+                — <s>Currently based in the greatest metropolis of Russia: <a href="https://www.google.com/search?q=Balashikha+city">Balashikha</a> (it doesn't matter if you’ve never heard of it, nobody has)</s> I've moved to Moscow :(
             </p>
             <p>
                 <h3>
@@ -110,30 +110,25 @@
                 text-decoration: none;">РУССКИЙ</a>
         </footer>
         <script>
-            // Spotify scrobbles to Last.fm; a Last.fm API key is read-only, so it is fine to ship it in the page
             const LASTFM_USER = 'the_bebra';
             const LASTFM_KEY = '6d9ed6b7f1226bb62672588dcde5d18a';
-            // Last.fm's grey star placeholder for tracks without a cover
             const NO_COVER = '2a96cbd8b46e442fc41c2b86b821562f';
 
             async function nowPlaying() {
                 try {
-                    const res = await fetch('https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&format=json&limit=1'
-                        + '&user=' + LASTFM_USER + '&api_key=' + LASTFM_KEY);
-                    // a single track comes back as an object, not an array
+                    const res = await fetch('https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&format=json&limit=1' + '&user=' + LASTFM_USER + '&api_key=' + LASTFM_KEY);
                     const t = [].concat((await res.json()).recenttracks.track)[0];
                     const playing = t['@attr']?.nowplaying === 'true';
                     const cover = t.image.at(-1)['#text'];
                     const np = document.getElementById('np');
-                    // Last.fm has no Spotify track id, so link to a search for the track
+
                     np.href = 'https://open.spotify.com/search/' + encodeURIComponent(t.artist['#text'] + ' ' + t.name);
                     np.classList.toggle('playing', playing);
                     np.querySelector('.label').style.backgroundImage = cover && !cover.includes(NO_COVER) ? `url("${cover}")` : '';
-                    np.querySelector('small').textContent = playing ? '♫ now playing' : '♫ last played';
+                    np.querySelector('small').textContent = playing ? '♫ now listening' : '♫ last track';
                     np.querySelector('b').textContent = t.name;
                     np.querySelector('.text span').textContent = t.artist['#text'];
                 } catch (e) {
-                    // keep the static link to the Spotify profile
                 }
             }
             nowPlaying();
