@@ -94,16 +94,12 @@ a {
 
 /* spotify now playing: a CD with the cover printed on it */
 .np {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
     text-decoration-line: none;
 }
 
 .np .disc {
-    position: relative;
-    flex: 0 0 40%;
-    aspect-ratio: 1;
+    position: absolute;
+    inset: 15%;
     border-radius: 50%;
     border: 0.1rem solid #000000;
     background: conic-gradient(#d8e0e0, #f6c6ea, #c6f0f6, #f6f2c6, #d8e0e0);
@@ -141,9 +137,6 @@ a {
 }
 
 .np .text {
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
     padding: 0.3rem 0.5rem;
     background-color: #ffffe6;
     border: 0.1rem solid #000000;
